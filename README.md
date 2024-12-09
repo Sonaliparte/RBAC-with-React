@@ -9,13 +9,14 @@ This is a role-based Attendance Management System built using **React** and **Ta
 - **Role-Based Access**:
   - **Teacher**: Can view and edit attendance.
   - **Student**: Can only view attendance.
+  - **Parent**:Can only view Progress.
 - **Attendance Persistence**:
   - Attendance data is stored in the browser's local storage.
   - Changes to attendance are updated in real-time and persisted across sessions.
 - **Responsive Design**:
   - Tailwind CSS ensures mobile-first responsiveness.
 - **Authentication Simulation**:
-  - User role (`teacher` or `student`) is stored locally after login or registration.
+  - User role (`teacher` ,`student`,`Parent`) is stored locally after login or registration.
 
 ---
 
@@ -23,8 +24,7 @@ This is a role-based Attendance Management System built using **React** and **Ta
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/attendance-management-system.git
-   cd attendance-management-system
+   https://github.com/Ishaparte/RBAC-with-React.git
    ```
 
 2. Install dependencies:
@@ -73,7 +73,7 @@ src/
 ### Role-Based Features
 
 1. **View Attendance**:
-   - Accessible to both **Teacher** and **Student** roles.
+   - Accessible to both **Teacher**, **Parent** and **Student** roles.
    - Displays a table of students' attendance statuses.
 
 2. **Edit Attendance** (only for Teachers):
@@ -91,18 +91,7 @@ src/
 
 ---
 
-## Screenshots
 
-### Login Page
-![Login Page](https://via.placeholder.com/600x400?text=Login+Page)
-
-### View Attendance (Student Role)
-![View Attendance](https://via.placeholder.com/600x400?text=View+Attendance+Page)
-
-### Edit Attendance (Teacher Role)
-![Edit Attendance](https://via.placeholder.com/600x400?text=Edit+Attendance+Page)
-
----
 
 ## Future Enhancements
 
@@ -119,16 +108,12 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-## Contributing
 
-Contributions are welcome! Please fork this repository and submit a pull request for review.
-
----
 
 ## Author
 
-**Your Name**  
-[GitHub](https://github.com/your-username) | [LinkedIn](https://linkedin.com/in/your-profile)
+**Isha Parte**  
+[GitHub]((https://github.com/Ishaparte)) | [LinkedIn]((https://www.linkedin.com/in/isha-parte-6b4a86249/))
 
 ---
 
