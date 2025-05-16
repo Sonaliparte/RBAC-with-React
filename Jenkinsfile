@@ -2,24 +2,22 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'rbac-react-app'       // Docker image name
-        CONTAINER_NAME = 'silly_satoshi' // Container name
-        APP_PORT = '3000'                   // React app runs on this port
+        IMAGE_NAME = 'rbac-react-app'
+        CONTAINER_NAME = 'silly_satoshi'
+        APP_PORT = '3000'
     }
 
     options {
-        timestamps() // Adds timestamps to logs
+        timestamps()
     }
 
     stages {
 
         stage('Update Image') {
             steps {
-                echo 'Pulling latest Docker image or rebuilding...'
-                // Optional: pull from Docker Hub, or build locally
-                // Uncomment below if you want to build instead of pull:
-                // sh "docker build -t $IMAGE_NAME ."
-                bat "docker pull $IMAGE_NAME || echo 'Image not found on registry, skipping pull.'"
+                echo 'Using existing local Docker image — skipping pull.'
+                // You can even validate it exists:
+                bat "docker images -q %IMAGE_NAME% || echo 'Image not found locally!'"
             }
         }
 
@@ -27,7 +25,7 @@ pipeline {
             steps {
                 echo 'Running tests inside Docker container...'
                 bat """
-                    docker run --rm $IMAGE_NAME npm test || echo 'No tests found or failed'
+                    docker run --rm %IMAGE_NAME% npm test || echo 'No tests found or failed'
                 """
             }
         }
@@ -36,8 +34,8 @@ pipeline {
             steps {
                 echo 'Deploying Docker container...'
                 bat """
-                    docker rm -f $CONTAINER_NAME || true
-                    docker run -d --name $CONTAINER_NAME -p $APP_PORT:80 $IMAGE_NAME
+                    docker rm -f %CONTAINER_NAME% || echo 'No existing container to remove'
+                    docker run -d --name %CONTAINER_NAME% -p %APP_PORT%:80 %IMAGE_NAME%
                 """
             }
         }
@@ -46,7 +44,6 @@ pipeline {
     post {
         success {
             echo '✅ Pipeline finished successfully.'
-            // Optional: show last Git commit info
             bat "git log -1 --oneline || echo 'Git log not available'"
         }
         failure {
