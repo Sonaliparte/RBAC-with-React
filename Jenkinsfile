@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'rbac-react-app'
-        CONTAINER_NAME = 'silly_satoshi'
+        IMAGE_NAME = 'rbac'
+        CONTAINER_NAME = 'amazing_lichterman'
         APP_PORT = '3000'
     }
 
