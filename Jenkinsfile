@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'rbac-react-app'       // Docker image name
-        CONTAINER_NAME = 'reverent_lumiere' // Container name
+        CONTAINER_NAME = 'silly_satoshi' // Container name
         APP_PORT = '3000'                   // React app runs on this port
     }
 
