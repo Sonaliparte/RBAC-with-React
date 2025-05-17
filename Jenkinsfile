@@ -4,7 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME     = 'rbac-react-app'
         CONTAINER_NAME = 'rbac-react-container'
-        PORT           = '5173'
+        PORT           = '3000'
     }
 
     stages {
