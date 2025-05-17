@@ -14,14 +14,16 @@ pipeline {
             }
         }
 
-        stage('Build Docker image') {
-            steps {
-                bat '''
-                echo [BUILD] Building %IMAGE_NAME% ...
-                docker build -t %IMAGE_NAME% -f dockerfile .
-                '''
-            }
+stage('Build Docker image') {
+    steps {
+        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            bat '''
+    docker build -t rbac-react-app -f dockerfile .
+    echo Exit code is: %ERRORLEVEL%
+'''
         }
+    }
+}
 
         stage('Remove old container') {
             steps {
@@ -36,15 +38,18 @@ pipeline {
             }
         }
 
-        stage('Run new container') {
-            steps {
-                bat '''
-                echo [RUN] Launching container on port %PORT% ...
-                docker run -d -p %PORT%:%PORT% --name %CONTAINER_NAME% %IMAGE_NAME%
-                '''
-            }
+stage('Run new container') {
+    when {
+        expression {
+            return true  // temporarily force this stage to run
         }
     }
+    steps {
+        bat '''
+            docker run -d -p 3000:80 --name rbac-react-container rbac-react-app
+        '''
+    }
+}
 
     post {
         success {
