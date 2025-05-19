@@ -28,8 +28,8 @@ pipeline {
         stage('Remove old container') {
             steps {
                 bat '''
-                    if docker ps -a -q -f name=rbac-container; then
-                        docker rm -f rbac-container
+                    if docker ps -a -q -f name=rbac-react-container; then
+                        docker rm -f rbac-react-container
                     else
                         echo "No existing container found"
                     fi
@@ -56,10 +56,10 @@ pipeline {
             }
             post {
                 success {
-                    echo "✅  Visit your app at http://localhost:${PORT}"
+                    echo "  Visit your app at http://localhost:${PORT}"
                 }
                 failure {
-                    echo "❌  Build failed – check the log."
+                    echo "  Build failed – check the log."
                 }
             }
         }
