@@ -25,17 +25,16 @@ pipeline {
             }
         }
 
-        stage('Remove old container') {
-            steps {
-                bat '''
-                    if docker ps -a -q -f name=rbac-react-container; then
-                        docker rm -f rbac-react-container
-                    else
-                        echo "No existing container found"
-                    fi
-                '''
-            }
-        }
+        // stage('Remove old container') {
+        //     steps {
+        //         bat '''
+        //             if docker ps -a -q -f name=rbac-react-container; then
+        //                 docker rm -f rbac-react-container
+        //             else
+        //                 echo "No existing container found"
+        //         '''
+        //     }
+        // }
 
         stage('Run new container') {
             when {
