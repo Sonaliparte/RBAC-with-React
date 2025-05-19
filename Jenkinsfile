@@ -25,18 +25,17 @@ stage('Build Docker image') {
     }
 }
 
-        stage('Remove old container') {
-            steps {
-                bat '''
-                @echo off
-                for /f "tokens=* delims=" %%i in ('docker ps -a --format "{{.Names}}" ^| findstr /R /C:"^%CONTAINER_NAME%$"') do (
-                    echo [CLEAN] Stopping %%i ...
-                    docker stop %%i  2>NUL
-                    docker rm   %%i  2>NUL
-                )
-                '''
-            }
-        }
+stage('Remove old container') {
+    steps {
+        bat(script: '''
+        if docker ps -a -q -f name=rbac-container; then
+            docker rm -f rbac-container
+        else
+            echo "No existing container found"
+        fi
+        ''')
+    }
+}
 
 stage('Run new container') {
     when {
