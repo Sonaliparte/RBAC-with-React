@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+     agent { label 'ubuntu' }
 
     environment {
         IMAGE_NAME     = 'rbac-react-app'
@@ -29,19 +29,17 @@ pipeline {
         stage('Push to Google Container Registry and Deploy to Cloud Run') {
             steps {
                 withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                    bat '''
-                        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
-                        gcloud config set project rbca-460307
-                        
-                        docker tag $IMAGE_NAME:latest $GCR_IMAGE_NAME
-                        docker push $GCR_IMAGE_NAME
-
-                        gcloud run deploy rbac-react-service \
-                          --image $GCR_IMAGE_NAME \
-                          --platform managed \
-                          --region us-central1 \
-                          --allow-unauthenticated
-                    '''
+                 bat "gcloud auth activate-service-account --key-file=%GOOGLE_APPLICATION_CREDENTIALS%"
+bat "gcloud config set project rbca-460307"
+bat "docker tag %IMAGE_NAME%:latest %GCR_IMAGE_NAME%"
+bat "docker push %GCR_IMAGE_NAME%"
+bat '''
+gcloud run deploy rbac-react-service ^
+  --image %GCR_IMAGE_NAME% ^
+  --platform managed ^
+  --region us-central1 ^
+  --allow-unauthenticated
+'''
                 }
             }
         }
