@@ -17,7 +17,7 @@ pipeline {
 
         stage('Build Docker image') {
             steps {
-                sh '''
+                bat '''
                     docker build -t $IMAGE_NAME -f dockerfile .
                 '''
             }
@@ -26,7 +26,7 @@ pipeline {
         stage('Push to Google Container Registry and Deploy to Cloud Run') {
             steps {
                 withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                    sh '''
+                    bat '''
                         gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
                         gcloud config set project rbca-460307
                         
