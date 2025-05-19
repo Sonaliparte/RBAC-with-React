@@ -1,5 +1,5 @@
 pipeline {
-     agent { label 'ubuntu' }
+     agent any
 
     environment {
         IMAGE_NAME     = 'rbac-react-app'
