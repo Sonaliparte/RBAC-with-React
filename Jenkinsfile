@@ -15,11 +15,14 @@ pipeline {
             }
         }
 
-        stage('Build Docker image') {
+      stage('Build Docker image') {
             steps {
-                bat '''
-                    docker build -t $IMAGE_NAME -f dockerfile .
-                '''
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    bat '''
+                        docker build -t rbac-react-app -f dockerfile .
+                        echo Exit code is: %ERRORLEVEL%
+                    '''
+                }
             }
         }
 
