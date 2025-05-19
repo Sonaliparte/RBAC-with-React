@@ -57,5 +57,6 @@ stage('Run new container') {
         failure {
             echo "❌  Build failed – check the log."
         }
-    }//
-}//
+    }
+}
+}
