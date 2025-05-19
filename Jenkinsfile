@@ -5,7 +5,7 @@ pipeline {
         IMAGE_NAME     = 'rbac-react-app'
         CONTAINER_NAME = 'rbac-react-container'
         PORT           = '3000'
-        GCR_IMAGE_NAME = 'gcr.io/rbca-460307/RBCA'
+        GCR_IMAGE_NAME = 'gcr.io/rbca-460307/rbca'
         GCLOUD_PATH    = 'C:\\Users\\sonal\\AppData\\Local\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud'
     }
 
