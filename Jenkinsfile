@@ -14,49 +14,54 @@ pipeline {
             }
         }
 
-stage('Build Docker image') {
-    steps {
-        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            bat '''
-    docker build -t rbac-react-app -f dockerfile .
-    echo Exit code is: %ERRORLEVEL%
-'''
+        stage('Build Docker image') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    bat '''
+                        docker build -t rbac-react-app -f dockerfile .
+                        echo Exit code is: %ERRORLEVEL%
+                    '''
+                }
+            }
         }
-    }
-}
 
-stage('Remove old container') {
-    steps {
-        bat(script: '''
-        if docker ps -a -q -f name=rbac-container; then
-            docker rm -f rbac-container
-        else
-            echo "No existing container found"
-        fi
-        ''')
-    }
-}
+        stage('Remove old container') {
+            steps {
+                bat '''
+                    if docker ps -a -q -f name=rbac-container; then
+                        docker rm -f rbac-container
+                    else
+                        echo "No existing container found"
+                    fi
+                '''
+            }
+        }
 
-stage('Run new container') {
-    when {
-        expression {
-            return true  // temporarily force this stage to run
+        stage('Run new container') {
+            when {
+                expression {
+                    return true  // always run for now
+                }
+            }
+            steps {
+                bat '''
+                    docker run -d -p 3000:80 --name rbac-react-container rbac-react-app
+                '''
+            }
         }
-    }
-    steps {
-        bat '''
-            docker run -d -p 3000:80 --name rbac-react-container rbac-react-app
-        '''
-    }
-}
 
-    post {
-        success {
-            echo "✅  Visit your app at http://localhost:${PORT}"
-        }
-        failure {
-            echo "❌  Build failed – check the log."
+        stage('Build') {
+            steps {
+                echo 'Building...'
+            }
+            post {
+                success {
+                    echo "✅  Visit your app at http://localhost:${PORT}"
+                }
+                failure {
+                    echo "❌  Build failed – check the log."
+                }
+            }
         }
     }
-}
 }
