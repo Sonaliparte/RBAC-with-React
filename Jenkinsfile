@@ -29,10 +29,11 @@ pipeline {
             }
         }
 
-   stage('Authenticate with GCP & Push Image') {
+stage('Authenticate with GCP & Push Image') {
     steps {
         withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
             bat '''
+                set "PATH=C:\\Program Files\\Docker\\Docker\\resources\\bin;%PATH%"
                 docker run --rm ^
                     -v %GOOGLE_APPLICATION_CREDENTIALS%:/tmp/key.json ^
                     -v %WORKSPACE%\\.gcloud:/root/.config ^
@@ -53,10 +54,13 @@ pipeline {
     }
 }
 
+
 stage('Deploy to Cloud Run') {
     steps {
         withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
             bat '''
+                set "PATH=C:\\Program Files\\Docker\\Docker\\resources\\bin;%PATH%"
+                
                 docker run --rm ^
                     -v %GOOGLE_APPLICATION_CREDENTIALS%:/tmp/key.json ^
                     -v %WORKSPACE%\\.gcloud:/root/.config ^
@@ -68,15 +72,15 @@ stage('Deploy to Cloud Run') {
 
                 docker run --rm ^
                     -v %WORKSPACE%\\.gcloud:/root/.config ^
-                    google/cloud-sdk:slim gcloud run deploy rbac-react-service ^
+                    google/cloud-sdk:slim gcloud run deploy rbca ^
                         --image gcr.io/rbca-460307/rbca ^
                         --platform managed ^
-                        --region us-central1 ^
+                        --region asia-south1 ^
                         --allow-unauthenticated
             '''
         }
     }
 }
     }
-}
+    }
 
