@@ -30,36 +30,34 @@ pipeline {
         }
 
         stage('Authenticate with GCP & Push Image') {
-            steps {
-                withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                    bat '''
-                    set "PATH=%DOCKER_PATH%;%PATH%"
-                    docker run --rm ^
-                        -v %GOOGLE_APPLICATION_CREDENTIALS%:/tmp/key.json ^
-                        -v %USERPROFILE%\\.config:/root/.config ^
-                        google/cloud-sdk:slim gcloud auth activate-service-account --key-file=/tmp/key.json
+    steps {
+        withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+            bat '''
+            set "PATH=%DOCKER_PATH%;%PATH%"
+            gcloud auth activate-service-account --key-file=%GOOGLE_APPLICATION_CREDENTIALS%
+            gcloud auth configure-docker gcr.io --quiet
 
-                    docker tag %IMAGE_NAME%:latest %GCR_IMAGE_NAME%
-                    docker push %GCR_IMAGE_NAME%
-                    '''
-                }
-            }
+            docker tag %IMAGE_NAME%:latest %GCR_IMAGE_NAME%
+            docker push %GCR_IMAGE_NAME%
+            '''
         }
+    }
+}
 
-        stage('Deploy to Cloud Run') {
-            steps {
-                withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                    bat '''
-                    set "PATH=%DOCKER_PATH%;%PATH%"
-                    docker run --rm ^
-                        -v %GOOGLE_APPLICATION_CREDENTIALS%:/tmp/key.json ^
-                        -v %USERPROFILE%\\.config:/root/.config ^
-                        google/cloud-sdk:slim sh -c "gcloud auth activate-service-account --key-file=/tmp/key.json && \
-                        gcloud config set project rbca-460307 && \
-                        gcloud run deploy %SERVICE_NAME% --image %GCR_IMAGE_NAME% --platform managed --region %REGION% --allow-unauthenticated"
-                    '''
-                }
-            }
+stage('Deploy to Cloud Run') {
+    steps {
+        withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+            bat '''
+            set "PATH=%DOCKER_PATH%;%PATH%"
+            gcloud auth activate-service-account --key-file=%GOOGLE_APPLICATION_CREDENTIALS%
+            gcloud config set project rbca-460307
+
+            gcloud run deploy %SERVICE_NAME% ^
+                --image %GCR_IMAGE_NAME% ^
+                --platform managed ^
+                --region %REGION% ^
+                --allow-unauthenticated
+            '''
         }
     }
 }
