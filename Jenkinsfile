@@ -3,10 +3,9 @@ pipeline {
 
     environment {
         IMAGE_NAME     = 'rbac-react-app'
-        CONTAINER_NAME = 'rbac-react-container'
-        PORT           = '3000'
         GCR_IMAGE_NAME = 'gcr.io/rbca-460307/rbca'
-        GCLOUD_PATH    = 'C:\Users\sonal\AppData\Local\Google\Cloud SDK'
+        REGION         = 'us-central1'
+        SERVICE_NAME   = 'rbac-react-service'
     }
 
     stages {
@@ -15,7 +14,6 @@ pipeline {
                 checkout scm
             }
         }
-
         stage('Build Docker image') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
@@ -27,20 +25,36 @@ pipeline {
             }
         }
 
-        stage('Push to Google Container Registry and Deploy to Cloud Run') {
+          stage('Authenticate with GCP & Push Image') {
             steps {
                 withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                    bat "\"%GCLOUD_PATH%\" auth activate-service-account --key-file=%GOOGLE_APPLICATION_CREDENTIALS%"
-                    bat "\"%GCLOUD_PATH%\" config set project rbca-460307"
-                    bat "docker tag %IMAGE_NAME%:latest %GCR_IMAGE_NAME%"
-                    bat "docker push %GCR_IMAGE_NAME%"
-                    bat """
-                        \"%GCLOUD_PATH%\" run deploy rbac-react-service ^
-                        --image %GCR_IMAGE_NAME% ^
-                        --platform managed ^
-                        --region us-central1 ^
-                        --allow-unauthenticated
-                    """
+                    bat '''
+                        docker run --rm -v $GOOGLE_APPLICATION_CREDENTIALS:/tmp/key.json \
+                                   -v $HOME/.config:/root/.config \
+                                   google/cloud-sdk:slim gcloud auth activate-service-account --key-file=/tmp/key.json
+
+                        docker tag ${IMAGE_NAME}:latest ${GCR_IMAGE_NAME}
+                        docker push ${GCR_IMAGE_NAME}
+                    '''
+                }
+            }
+        }
+
+         stage('Deploy to Cloud Run') {
+            steps {
+                withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    bat '''
+                        docker run --rm -v $GOOGLE_APPLICATION_CREDENTIALS:/tmp/key.json \
+                                   -v $HOME/.config:/root/.config \
+                                   google/cloud-sdk:slim sh -c "
+                            gcloud auth activate-service-account --key-file=/tmp/key.json &&
+                            gcloud config set project rbca-460307 &&
+                            gcloud run deploy ${SERVICE_NAME} \
+                                --image ${GCR_IMAGE_NAME} \
+                                --platform managed \
+                                --region ${REGION} \
+                                --allow-unauthenticated"
+                    '''
                 }
             }
         }
