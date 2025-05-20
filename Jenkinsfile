@@ -18,6 +18,8 @@ pipeline {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     bat '''
+                    set PATH=C:\\Program Files\\Docker\\Docker\\resources\\bin;%PATH%
+docker --version
                         docker build -t rbac-react-app -f dockerfile .
                         echo Exit code is: %ERRORLEVEL%
                     '''
