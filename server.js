@@ -1,12 +1,15 @@
-const express = require('express');
+// server.js
+
+import express from 'express';
+
 const app = express();
 
-const PORT = process.env.PORT || 8000;
+const port = process.env.PORT || 8080;
 
 app.get('/', (req, res) => {
-  res.send('Hello from Cloud Run!');
+  res.send('Hello from backend!');
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
